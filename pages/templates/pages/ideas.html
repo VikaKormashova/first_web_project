@@ -1,0 +1,28 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}Все идеи | DateIdeas{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Все идеи для свиданий</h1>
+    
+    <div class="row">
+        {% for idea in all_ideas %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{{ idea.image }}" class="card-img-top" alt="{{ idea.title }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ idea.title }}</h5>
+                    <p class="card-text">{{ idea.description }}</p>
+                    <span class="badge bg-secondary mb-2">{{ idea.category }}</span>
+                    <p class="text-muted small mt-2">💰 Бюджет: {{ idea.budget }}</p>
+                    <button class="btn btn-primary mt-2" onclick="alert('Идея сохранена в избранное!')">
+                        Сохранить идею
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
