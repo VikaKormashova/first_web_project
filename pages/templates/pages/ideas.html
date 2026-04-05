@@ -18,7 +18,7 @@
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ idea.title }}</h5>
-                    <p class="card-text">{{ idea.description }}</p>
+                    <p class="card-text">{{ idea.description|truncatewords:30 }}</p>
                     <span class="badge bg-secondary">{{ idea.get_category_display }}</span>
                     <span class="badge bg-info">{{ idea.get_budget_display }}</span>
                     <p class="text-muted small mt-2">⏱️ {{ idea.duration_hours }} часа</p>
