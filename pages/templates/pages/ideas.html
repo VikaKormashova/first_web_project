@@ -5,22 +5,32 @@
 {% block content %}
 <div class="container my-5">
     <h1 class="text-center mb-4">Все идеи для свиданий</h1>
+    <p class="text-center text-muted">Всего идей: {{ total_count }}</p>
     
-    <div class="row">
+    <div class="row mt-4">
         {% for idea in all_ideas %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                <img src="{{ idea.image }}" class="card-img-top" alt="{{ idea.title }}" style="height: 200px; object-fit: cover;">
+                {% if idea.image_url %}
+                <img src="{{ idea.image_url }}" class="card-img-top" alt="{{ idea.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <img src="https://placehold.co/300x200?text={{ idea.title }}" class="card-img-top" alt="{{ idea.title }}">
+                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ idea.title }}</h5>
                     <p class="card-text">{{ idea.description }}</p>
-                    <span class="badge bg-secondary mb-2">{{ idea.category }}</span>
-                    <p class="text-muted small mt-2">💰 Бюджет: {{ idea.budget }}</p>
+                    <span class="badge bg-secondary">{{ idea.get_category_display }}</span>
+                    <span class="badge bg-info">{{ idea.get_budget_display }}</span>
+                    <p class="text-muted small mt-2">⏱️ {{ idea.duration_hours }} часа</p>
                     <button class="btn btn-primary mt-2" onclick="alert('Идея сохранена в избранное!')">
                         Сохранить идею
                     </button>
                 </div>
             </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">Пока нет идей. Добавьте их через админку!</p>
         </div>
         {% endfor %}
     </div>

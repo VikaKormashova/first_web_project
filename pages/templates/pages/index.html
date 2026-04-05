@@ -1,6 +1,6 @@
 {% extends 'pages/base.html' %}
 
-{% block title %}Главная | DateIdeas — идеи для свиданий{% endblock %}
+{% block title %}Главная | DateIdeas{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -9,31 +9,37 @@
         <p class="lead">
             <i>{{ site_name }}</i> — {{ description }}
         </p>
+        <p class="text-muted">Всего идей: {{ ideas_count }}</p>
         <div class="mt-4">
-            <button type="button" class="btn btn-primary me-2">Случайная идея</button>
+            <a href="{% url 'ideas' %}" class="btn btn-primary me-2">Смотреть все идеи</a>
             <button type="button" class="btn btn-primary me-2">Избранное</button>
             <button type="button" class="btn btn-primary">Добавить</button>
         </div>
     </div>
-    
-    <br>
     
     <div class="container">
         <div class="row">
             {% for idea in ideas %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
-                    <img src="{{ idea.image }}" class="card-img-top" alt="{{ idea.title }}">
+                    {% if idea.image_url %}
+                    <img src="{{ idea.image_url }}" class="card-img-top" alt="{{ idea.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <img src="https://placehold.co/300x200?text={{ idea.title }}" class="card-img-top" alt="{{ idea.title }}">
+                    {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ idea.title }}</h5>
-                        <p class="card-text">{{ idea.description }}</p>
-                        <button type="button" class="btn btn-primary">Подробнее</button>
+                        <p class="card-text">{{ idea.description|truncatewords:20 }}</p>
+                        <span class="badge bg-secondary">{{ idea.get_category_display }}</span>
+                        <span class="badge bg-info">{{ idea.get_budget_display }}</span>
+                        <p class="text-muted small mt-2">⏱️ {{ idea.duration_hours }} часа</p>
+                        <button type="button" class="btn btn-primary mt-2">Подробнее</button>
                     </div>
                 </div>
             </div>
             {% empty %}
             <div class="col-12">
-                <p class="text-center">Пока нет идей. Добавьте их позже!</p>
+                <p class="text-center">Пока нет идей. Добавьте их через админку!</p>
             </div>
             {% endfor %}
         </div>
