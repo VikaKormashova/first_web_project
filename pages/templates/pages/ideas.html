@@ -22,12 +22,15 @@
                     <span class="badge bg-secondary">{{ idea.get_category_display }}</span>
                     <span class="badge bg-info">{{ idea.get_budget_display }}</span>
                     <p class="text-muted small mt-2">⏱️ {{ idea.duration_hours }} часа</p>
-                    <button class="btn btn-primary mt-2" onclick="alert('Идея сохранена в избранное!')">
-                        Сохранить идею
-                    </button>
-                </div>
-            </div>
-        </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <a href="{% url 'idea_detail' idea.pk %}" class="btn btn-primary btn-sm">Подробнее</a>
+                        <button class="btn btn-outline-success btn-sm" onclick="alert('Идея сохранена в избранное!')">
+                            Сохранить
+                        </button>
+                    </div>
+                </div>   
+            </div>       
+        </div>           
         {% empty %}
         <div class="col-12">
             <p class="text-center">Пока нет идей. Добавьте их через админку!</p>

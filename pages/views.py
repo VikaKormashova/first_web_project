@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Idea
 
 def index(request):
@@ -48,3 +49,11 @@ def get_category_description(category_code):
         'home': 'Уютные вечера дома, совместное приготовление еды и киномарафоны',
     }
     return descriptions.get(category_code, 'Интересные идеи для свиданий')
+
+def idea_detail(request, pk):
+    idea = get_object_or_404(Idea, pk=pk, is_active=True)
+    
+    context = {
+        'idea': idea,
+    }
+    return render(request, 'pages/detail.html', context)

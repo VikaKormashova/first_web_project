@@ -1,0 +1,54 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}{{ idea.title }} | DateIdeas{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                {% if idea.image_url %}
+                <img src="{{ idea.image_url }}" class="card-img-top" alt="{{ idea.title }}" style="max-height: 400px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                    <h3 class="text-center">{{ idea.title }}</h3>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h1 class="card-title mb-3">{{ idea.title }}</h1>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-secondary fs-6">{{ idea.get_category_display }}</span>
+                        <span class="badge bg-info fs-6 ms-2">{{ idea.get_budget_display }}</span>
+                        <span class="badge bg-warning ms-2">{{ idea.duration_hours }} часа</span>
+                    </div>
+                    
+                    <hr>
+                    <h4>Описание:</h4>
+                    <p class="lead">{{ idea.description|linebreaks }}</p>
+                    
+                    <hr>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <p><strong>📅 Добавлено:</strong> {{ idea.created_at|date:"d.m.Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>🔄 Обновлено:</strong> {{ idea.updated_at|date:"d.m.Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">← Назад к списку</a>
+                        <a href="{% url 'ideas' %}" class="btn btn-outline-primary ms-2">Все идеи</a>
+                        <button class="btn btn-success ms-2" onclick="alert('Идея сохранена в избранное!')">
+                            ❤️ Сохранить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
