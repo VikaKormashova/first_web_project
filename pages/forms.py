@@ -34,14 +34,15 @@ class IdeaForm(forms.ModelForm):
     class Meta:
         
         model = Idea
-        fields = ['title', 'description', 'category', 'budget', 'duration_hours', 'image_url', 'is_active']
+        fields = ['title', 'description', 'category', 'budget', 'duration_hours', 'image', 'tags', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Например: Пикник на крыше'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Подробное описание идеи...'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'budget': forms.Select(attrs={'class': 'form-select'}),
             'duration_hours': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 10}),
-            'image_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://...'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'tags': forms.SelectMultiple(attrs={'class': 'form-select'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
@@ -50,6 +51,7 @@ class IdeaForm(forms.ModelForm):
             'category': 'Категория',
             'budget': 'Бюджет',
             'duration_hours': 'Длительность (часы)',
-            'image_url': 'Ссылка на изображение (опционально)',
+            'image': 'Изображение',
+            'tags': 'Теги',
             'is_active': 'Активна',
         }

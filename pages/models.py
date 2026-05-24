@@ -1,6 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True, verbose_name='Название тега')
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
 class Idea(models.Model):
     
     CATEGORY_CHOICES = [
@@ -44,6 +54,12 @@ class Idea(models.Model):
         null=True,
         verbose_name='Ссылка на изображение'
     )
+    image = models.ImageField(
+        upload_to='ideas_images/',
+        blank=True,
+        null=True,
+        verbose_name='Изображение'
+    )
     duration_hours = models.IntegerField(
         default=2,
         verbose_name='Длительность (часы)'
@@ -67,11 +83,12 @@ class Idea(models.Model):
         null=True,
         blank=True
     )
+    tags = models.ManyToManyField(Tag, blank=True, related_name='ideas', verbose_name='Теги')
     
-def __str__(self):
-    return self.title
+    def __str__(self):
+        return self.title
     
-class Meta:
-    verbose_name = 'Идея для свидания'
-    verbose_name_plural = 'Идеи для свиданий'
-    ordering = ['-created_at']
+    class Meta:
+        verbose_name = 'Идея для свидания'
+        verbose_name_plural = 'Идеи для свиданий'
+        ordering = ['-created_at']
