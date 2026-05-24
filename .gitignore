@@ -1,12 +1,28 @@
+# Virtual environment
 venv/
+env/
+ENV/
+
+# Python
 __pycache__/
-.vscode/
-.idea/
-*.sqlite3
-*.db
 *.pyc
 *.pyo
-.DS_Store
-*.swp
-/env
+*.pyc
+
+# Secrets
 .env
+.env.local
+.env.*
+!.env.example
+
+# Database
+*.sqlite3
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store

@@ -1,6 +1,6 @@
-from django.shortcuts import render
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Idea
+from .forms import FeedbackForm
 
 def index(request):
     latest_ideas = Idea.objects.filter(is_active=True)[:3]
@@ -57,3 +57,27 @@ def idea_detail(request, pk):
         'idea': idea,
     }
     return render(request, 'pages/detail.html', context)
+
+def contact(request):
+    
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            print("=" * 50)
+            print("НОВОЕ СООБЩЕНИЕ С САЙТА")
+            print(f"Тема: {cleaned_data['subject']}")
+            print(f"Email: {cleaned_data['email']}")
+            print(f"Сообщение: {cleaned_data['text']}")
+            print("=" * 50)
+            
+            return redirect('home')
+    else:
+        form = FeedbackForm()
+    
+    context = {
+        'form': form,
+        'title': 'Обратная связь',
+    }
+    return render(request, 'pages/contact.html', context)
