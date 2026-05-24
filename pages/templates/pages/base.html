@@ -37,9 +37,32 @@
                             <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
                                href="{% url 'contact' %}">Контакты</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Войти</a>
-                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'idea_create' %}">➕ Добавить идею</a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link text-success">👤 {{ user.username }}</span>
+                            </li>
+                            <li class="nav-item">
+                                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 0; margin: 0; border: none; background: none; color: inherit; cursor: pointer;">
+                                        🚪 Выйти
+                                    </button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">🔐 Войти</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">📝 Регистрация</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -54,9 +77,10 @@
     <footer class="mt-5">
         <div class="container">
             <p class="text-muted text-end">
-                © Кормашова Виктория (2026)<br>
-                <a href="https://github.com/VikaKormashova" target="_blank">
-                    Github
+                © Кормашова Виктория (2026)
+
+             <a href="https://github.com/VikaKormashova" target="_blank">
+                Github
                 </a>
             </p>
         </div>
