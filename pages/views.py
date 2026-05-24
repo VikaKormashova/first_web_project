@@ -1,31 +1,115 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
 from .models import Idea, Tag, Comment
 from .forms import FeedbackForm, IdeaForm, CommentForm
 
-def index(request):
-    latest_ideas = Idea.objects.filter(is_active=True)[:3]
+class HomeView(ListView):
+    model = Idea
+    template_name = 'pages/index.html'
+    context_object_name = 'ideas'
     
-    context = {
-        'title': 'Копилка идей для свиданий',
-        'site_name': 'DateIdeas',
-        'description': '100+ способов удивить вторую половинку. Здесь собраны идеи на любой вкус: от романтических пикников до активных приключений.',
-        'ideas': latest_ideas,
-        'ideas_count': Idea.objects.filter(is_active=True).count(),
-    }
-    return render(request, 'pages/index.html', context)
+    def get_queryset(self):
+        return Idea.objects.filter(is_active=True)[:3]
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Копилка идей для свиданий'
+        context['site_name'] = 'DateIdeas'
+        context['description'] = '100+ способов удивить вторую половинку. Здесь собраны идеи на любой вкус: от романтических пикников до активных приключений.'
+        context['ideas_count'] = Idea.objects.filter(is_active=True).count()
+        return context
 
-def ideas(request):
-    all_ideas = Idea.objects.filter(is_active=True)
+class IdeaListView(ListView):
+    model = Idea
+    template_name = 'pages/ideas.html'
+    context_object_name = 'all_ideas'
     
-    context = {
-        'all_ideas': all_ideas,
-        'total_count': all_ideas.count(),
-    }
-    return render(request, 'pages/ideas.html', context)
+    def get_queryset(self):
+        return Idea.objects.filter(is_active=True)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_count'] = self.get_queryset().count()
+        return context
+
+class IdeaDetailView(DetailView):
+    model = Idea
+    template_name = 'pages/detail.html'
+    context_object_name = 'idea'
+    
+    def get_queryset(self):
+        return Idea.objects.filter(is_active=True)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = CommentForm()
+        return context
+
+class IdeaCreateView(LoginRequiredMixin, CreateView):
+    model = Idea
+    form_class = IdeaForm
+    template_name = 'pages/idea_form.html'
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        response = super().form_valid(form)
+        messages.success(self.request, 'Идея успешно создана!')
+        return response
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавить новую идею'
+        context['button_text'] = 'Создать'
+        return context
+
+class IdeaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Idea
+    form_class = IdeaForm
+    template_name = 'pages/idea_form.html'
+    
+    def test_func(self):
+        idea = self.get_object()
+        return idea.author == self.request.user
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Идея успешно обновлена!')
+        return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Редактирование: {self.object.title}'
+        context['button_text'] = 'Сохранить'
+        return context
+
+class IdeaDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Idea
+    template_name = 'pages/idea_confirm_delete.html'
+    success_url = reverse_lazy('home')
+    
+    def test_func(self):
+        idea = self.get_object()
+        return idea.author == self.request.user
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Идея успешно удалена!')
+        return super().delete(request, *args, **kwargs)
+
+class RegisterView(CreateView):
+    template_name = 'registration/register.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('home')
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, self.object)
+        messages.success(self.request, 'Регистрация прошла успешно!')
+        return response
 
 def categories(request):
     categories_list = []
@@ -55,7 +139,6 @@ def get_category_description(category_code):
     return descriptions.get(category_code, 'Интересные идеи для свиданий')
 
 def category_ideas(request, category_slug):
-    
     category_mapping = {
         'romantic': 'Романтика',
         'adventure': 'Приключения',
@@ -66,7 +149,6 @@ def category_ideas(request, category_slug):
     }
     
     category_name = category_mapping.get(category_slug, 'Категория')
-    
     ideas = Idea.objects.filter(category=category_slug, is_active=True)
     
     context = {
@@ -77,21 +159,9 @@ def category_ideas(request, category_slug):
     }
     return render(request, 'pages/category_ideas.html', context)
 
-def idea_detail(request, pk):
-    idea = get_object_or_404(Idea, pk=pk, is_active=True)
-    comment_form = CommentForm()
-    
-    context = {
-        'idea': idea,
-        'comment_form': comment_form,
-    }
-    return render(request, 'pages/detail.html', context)
-
 def contact(request):
-    
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
-        
         if form.is_valid():
             cleaned_data = form.cleaned_data
             print("=" * 50)
@@ -100,7 +170,7 @@ def contact(request):
             print(f"Email: {cleaned_data['email']}")
             print(f"Сообщение: {cleaned_data['text']}")
             print("=" * 50)
-            
+            messages.success(request, 'Сообщение отправлено!')
             return redirect('home')
     else:
         form = FeedbackForm()
@@ -110,63 +180,6 @@ def contact(request):
         'title': 'Обратная связь',
     }
     return render(request, 'pages/contact.html', context)
-
-@login_required
-def idea_create(request):
-    
-    if request.method == 'POST':
-        form = IdeaForm(request.POST, request.FILES)
-        if form.is_valid():
-            idea = form.save(commit=False)
-            idea.author = request.user
-            idea.save()
-            form.save_m2m()
-            return redirect('idea_detail', pk=idea.pk)
-    else:
-        form = IdeaForm()
-    
-    context = {'form': form,
-        'title': 'Добавить новую идею',
-        'button_text': 'Создать',
-    }
-    return render(request, 'pages/idea_form.html', context)
-
-@login_required
-def idea_update(request, pk):
-    
-    idea = get_object_or_404(Idea, pk=pk)
-    
-    if request.method == 'POST':
-        form = IdeaForm(request.POST, request.FILES, instance=idea)
-        if form.is_valid():
-            form.save()
-            return redirect('idea_detail', pk=idea.pk)
-    else:
-        form = IdeaForm(instance=idea)
-    
-    context = {
-        'form': form,
-        'title': f'Редактирование: {idea.title}',
-        'button_text': 'Сохранить',
-    }
-    return render(request, 'pages/idea_form.html', context)
-
-def register(request):
-    
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = UserCreationForm()
-    
-    context = {
-        'form': form,
-        'title': 'Регистрация',
-    }
-    return render(request, 'registration/register.html', context)
 
 def tag_ideas(request, tag_name):
     tag = get_object_or_404(Tag, name=tag_name)
