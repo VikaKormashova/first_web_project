@@ -1,5 +1,5 @@
 from django import forms
-from .models import Idea
+from .models import Idea, Tag, Comment
 
 class FeedbackForm(forms.Form):
     
@@ -54,4 +54,21 @@ class IdeaForm(forms.ModelForm):
             'image': 'Изображение',
             'tags': 'Теги',
             'is_active': 'Активна',
+        }
+
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Напишите ваш комментарий...'
+            }),
+        }
+        labels = {
+            'text': 'Ваш комментарий',
         }
