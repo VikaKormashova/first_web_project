@@ -6,6 +6,16 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-lg-8 mx-auto">
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
             <div class="card shadow-sm">
                 {% if idea.image %}
                 <img src="{{ idea.image.url }}" class="card-img-top" alt="{{ idea.title }}" style="max-height: 400px; object-fit: cover;">
@@ -49,17 +59,45 @@
                         </div>
                     </div>
                     
-                    <div class="mt-4">
-                        <a href="{% url 'home' %}" class="btn btn-secondary">← Назад к списку</a>
-                        <a href="{% url 'ideas' %}" class="btn btn-outline-primary ms-2">Все идеи</a>
-                        <a href="{% url 'idea_update' idea.pk %}" class="btn btn-warning ms-2">✏️ Редактировать</a>
-                        <button class="btn btn-success ms-2" onclick="alert('Идея сохранена в избранное!')">
-                            ❤️ Сохранить
-                        </button>
+                    <hr>
+                    <h3>Комментарии ({{ idea.comments.count }})</h3>
+                    
+                    {% for comment in idea.comments.all %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>{{ comment.author.username }}</strong>
+                            <small class="text-muted ms-2">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                            <p class="mt-2 mb-0">{{ comment.text }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Пока нет комментариев. Будьте первым!</p>
+                    {% endfor %}
+                    
+                    <hr>
+                    <h4>Добавить комментарий</h4>
+                    
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'add_comment' idea.pk %}" method="post">
+                            {% csrf_token %}
+                            {{ comment_form.as_p }}
+                            <button type="submit" class="btn btn-primary">Отправить</button>
+                        </form>
+                    {% else %}
+                        <p>Чтобы оставить комментарий, <a href="{% url 'login' %}">войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь</a>.</p>
+                        {% endif %}
+                        
+                        <div class="mt-4">
+                            <a href="{% url 'home' %}" class="btn btn-secondary">← Назад к списку</a>
+                            <a href="{% url 'ideas' %}" class="btn btn-outline-primary ms-2">Все идеи</a>
+                            <a href="{% url 'idea_update' idea.pk %}" class="btn btn-warning ms-2">✏️ Редактировать</a>
+                            <button class="btn btn-success ms-2" onclick="alert('Идея сохранена в избранное!')">
+                                ❤️ Сохранить
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %} <

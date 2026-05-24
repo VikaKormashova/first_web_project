@@ -92,3 +92,17 @@ class Idea(models.Model):
         verbose_name = 'Идея для свидания'
         verbose_name_plural = 'Идеи для свиданий'
         ordering = ['-created_at']
+
+class Comment(models.Model):
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(verbose_name='Комментарий')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    
+    def __str__(self):
+        return f'Комментарий от {self.author.username} к {self.idea.title}'
+    
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-created_at']

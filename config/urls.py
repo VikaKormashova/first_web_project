@@ -17,6 +17,7 @@ urlpatterns = [
     path('idea/create/', views.idea_create, name='idea_create'),
     path('idea/<int:pk>/edit/', views.idea_update, name='idea_update'),
     path('tag/<str:tag_name>/', views.tag_ideas, name='tag_ideas'),
+    path('idea/<int:pk>/comment/', views.add_comment, name='add_comment'),
 ]
 
 if settings.DEBUG:

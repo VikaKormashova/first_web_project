@@ -2,8 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from .models import Idea, Tag
-from .forms import FeedbackForm, IdeaForm
+from django.contrib import messages
+from .models import Idea, Tag, Comment
+from .forms import FeedbackForm, IdeaForm, CommentForm
 
 def index(request):
     latest_ideas = Idea.objects.filter(is_active=True)[:3]
@@ -78,9 +79,11 @@ def category_ideas(request, category_slug):
 
 def idea_detail(request, pk):
     idea = get_object_or_404(Idea, pk=pk, is_active=True)
+    comment_form = CommentForm()
     
     context = {
         'idea': idea,
+        'comment_form': comment_form,
     }
     return render(request, 'pages/detail.html', context)
 
@@ -175,3 +178,20 @@ def tag_ideas(request, tag_name):
         'ideas_count': ideas.count(),
     }
     return render(request, 'pages/tag_ideas.html', context)
+
+@login_required
+def add_comment(request, pk):
+    idea = get_object_or_404(Idea, pk=pk)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.idea = idea
+            comment.author = request.user
+            comment.save()
+            messages.success(request, 'Ваш комментарий успешно добавлен!')
+        else:
+            messages.error(request, 'Ошибка при добавлении комментария.')
+    
+    return redirect('idea_detail', pk=idea.pk)
