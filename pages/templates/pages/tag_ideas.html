@@ -1,0 +1,39 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}Идеи с тегом "{{ tag_name }}" | DateIdeas{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Идеи с тегом: {{ tag_name }}</h1>
+        <a href="{% url 'ideas' %}" class="btn btn-outline-secondary">← Все идеи</a>
+    </div>
+    
+    <p class="text-muted mb-4">Найдено идей: {{ ideas_count }}</p>
+    
+    <div class="row">
+        {% for idea in ideas %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if idea.image %}
+                <img src="{{ idea.image.url }}" class="card-img-top" alt="{{ idea.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <img src="https://placehold.co/300x200?text={{ idea.title }}" class="card-img-top" alt="{{ idea.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ idea.title }}</h5>
+                    <p class="card-text">{{ idea.description|truncatewords:20 }}</p>
+                    <a href="{% url 'idea_detail' idea.pk %}" class="btn btn-primary mt-2">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                Нет идей с таким тегом.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

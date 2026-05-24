@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Idea
+from .models import Idea, Tag
 
 @admin.register(Idea)
 class IdeaAdmin(admin.ModelAdmin):
@@ -14,10 +14,15 @@ class IdeaAdmin(admin.ModelAdmin):
             'fields': ('title', 'description', 'category', 'budget')
         }),
         ('Дополнительно', {
-            'fields': ('image_url', 'duration_hours', 'is_active', 'author')
+            'fields': ('image_url', 'image', 'duration_hours', 'is_active', 'author', 'tags')
         }),
         ('Даты', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)

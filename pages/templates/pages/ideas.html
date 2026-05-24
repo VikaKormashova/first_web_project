@@ -11,8 +11,8 @@
         {% for idea in all_ideas %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                {% if idea.image_url %}
-                <img src="{{ idea.image_url }}" class="card-img-top" alt="{{ idea.title }}" style="height: 200px; object-fit: cover;">
+                {% if idea.image %}
+                <img src="{{ idea.image.url }}" class="card-img-top" alt="{{ idea.title }}" style="height: 200px; object-fit: cover;">
                 {% else %}
                 <img src="https://placehold.co/300x200?text={{ idea.title }}" class="card-img-top" alt="{{ idea.title }}">
                 {% endif %}

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from .models import Idea
+from .models import Idea, Tag
 from .forms import FeedbackForm, IdeaForm
 
 def index(request):
@@ -112,17 +112,17 @@ def contact(request):
 def idea_create(request):
     
     if request.method == 'POST':
-        form = IdeaForm(request.POST)
+        form = IdeaForm(request.POST, request.FILES)
         if form.is_valid():
             idea = form.save(commit=False)
             idea.author = request.user
             idea.save()
+            form.save_m2m()
             return redirect('idea_detail', pk=idea.pk)
     else:
         form = IdeaForm()
     
-    context = {
-        'form': form,
+    context = {'form': form,
         'title': 'Добавить новую идею',
         'button_text': 'Создать',
     }
@@ -134,7 +134,7 @@ def idea_update(request, pk):
     idea = get_object_or_404(Idea, pk=pk)
     
     if request.method == 'POST':
-        form = IdeaForm(request.POST, instance=idea)
+        form = IdeaForm(request.POST, request.FILES, instance=idea)
         if form.is_valid():
             form.save()
             return redirect('idea_detail', pk=idea.pk)
@@ -164,3 +164,14 @@ def register(request):
         'title': 'Регистрация',
     }
     return render(request, 'registration/register.html', context)
+
+def tag_ideas(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    ideas = tag.ideas.filter(is_active=True)
+    
+    context = {
+        'tag_name': tag_name,
+        'ideas': ideas,
+        'ideas_count': ideas.count(),
+    }
+    return render(request, 'pages/tag_ideas.html', context)
