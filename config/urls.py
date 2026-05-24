@@ -9,4 +9,6 @@ urlpatterns = [
     path('categories/', views.categories, name='categories'),
     path('idea/<int:pk>/', views.idea_detail, name='idea_detail'),
     path('contact/', views.contact, name='contact'),
+    path('idea/create/', views.idea_create, name='idea_create'),
+    path('idea/<int:pk>/edit/', views.idea_update, name='idea_update'),
 ]

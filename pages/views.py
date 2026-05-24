@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Idea
-from .forms import FeedbackForm
+from .forms import FeedbackForm, IdeaForm
 
 def index(request):
     latest_ideas = Idea.objects.filter(is_active=True)[:3]
@@ -81,3 +81,39 @@ def contact(request):
         'title': 'Обратная связь',
     }
     return render(request, 'pages/contact.html', context)
+
+def idea_create(request):
+    
+    if request.method == 'POST':
+        form = IdeaForm(request.POST)
+        if form.is_valid():
+            idea = form.save()
+            return redirect('idea_detail', pk=idea.pk)
+    else:
+        form = IdeaForm()
+    
+    context = {
+        'form': form,
+        'title': 'Добавить новую идею',
+        'button_text': 'Создать',
+    }
+    return render(request, 'pages/idea_form.html', context)
+
+def idea_update(request, pk):
+    
+    idea = get_object_or_404(Idea, pk=pk)
+    
+    if request.method == 'POST':
+        form = IdeaForm(request.POST, instance=idea)
+        if form.is_valid():
+            form.save()
+            return redirect('idea_detail', pk=idea.pk)
+    else:
+        form = IdeaForm(instance=idea)
+    
+    context = {
+        'form': form,
+        'title': f'Редактирование: {idea.title}',
+        'button_text': 'Сохранить',
+    }
+    return render(request, 'pages/idea_form.html', context)

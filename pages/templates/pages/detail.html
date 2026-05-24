@@ -42,6 +42,7 @@
                     <div class="mt-4">
                         <a href="{% url 'home' %}" class="btn btn-secondary">← Назад к списку</a>
                         <a href="{% url 'ideas' %}" class="btn btn-outline-primary ms-2">Все идеи</a>
+                        <a href="{% url 'idea_update' idea.pk %}" class="btn btn-warning ms-2">✏️ Редактировать</a>
                         <button class="btn btn-success ms-2" onclick="alert('Идея сохранена в избранное!')">
                             ❤️ Сохранить
                         </button>
