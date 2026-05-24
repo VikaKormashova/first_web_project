@@ -14,7 +14,7 @@
                     <h3 class="card-title">{{ category.name }}</h3>
                     <p class="card-text">{{ category.description }}</p>
                     <p class="text-muted">Идей: {{ category.ideas_count }}</p>
-                    <a href="{% url 'ideas' %}" class="btn btn-outline-primary">Смотреть идеи</a>
+                    <a href="{% url 'category_ideas' category.code %}" class="btn btn-outline-primary">Смотреть идеи</a>
                 </div>
             </div>
         </div>

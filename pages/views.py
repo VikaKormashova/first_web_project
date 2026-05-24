@@ -1,4 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 from .models import Idea
 from .forms import FeedbackForm, IdeaForm
 
@@ -50,6 +53,29 @@ def get_category_description(category_code):
     }
     return descriptions.get(category_code, 'Интересные идеи для свиданий')
 
+def category_ideas(request, category_slug):
+    
+    category_mapping = {
+        'romantic': 'Романтика',
+        'adventure': 'Приключения',
+        'creative': 'Творчество',
+        'culture': 'Культура',
+        'active': 'Активный отдых',
+        'home': 'Домашний уют',
+    }
+    
+    category_name = category_mapping.get(category_slug, 'Категория')
+    
+    ideas = Idea.objects.filter(category=category_slug, is_active=True)
+    
+    context = {
+        'category_name': category_name,
+        'category_slug': category_slug,
+        'ideas': ideas,
+        'ideas_count': ideas.count(),
+    }
+    return render(request, 'pages/category_ideas.html', context)
+
 def idea_detail(request, pk):
     idea = get_object_or_404(Idea, pk=pk, is_active=True)
     
@@ -82,12 +108,15 @@ def contact(request):
     }
     return render(request, 'pages/contact.html', context)
 
+@login_required
 def idea_create(request):
     
     if request.method == 'POST':
         form = IdeaForm(request.POST)
         if form.is_valid():
-            idea = form.save()
+            idea = form.save(commit=False)
+            idea.author = request.user
+            idea.save()
             return redirect('idea_detail', pk=idea.pk)
     else:
         form = IdeaForm()
@@ -99,6 +128,7 @@ def idea_create(request):
     }
     return render(request, 'pages/idea_form.html', context)
 
+@login_required
 def idea_update(request, pk):
     
     idea = get_object_or_404(Idea, pk=pk)
@@ -117,3 +147,20 @@ def idea_update(request, pk):
         'button_text': 'Сохранить',
     }
     return render(request, 'pages/idea_form.html', context)
+
+def register(request):
+    
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    
+    context = {
+        'form': form,
+        'title': 'Регистрация',
+    }
+    return render(request, 'registration/register.html', context)

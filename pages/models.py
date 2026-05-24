@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Idea(models.Model):
     
@@ -59,11 +60,18 @@ class Idea(models.Model):
         auto_now=True,
         verbose_name='Дата обновления'
     )
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        verbose_name='Автор',
+        null=True,
+        blank=True
+    )
     
-    def __str__(self):
-        return self.title
+def __str__(self):
+    return self.title
     
-    class Meta:
-        verbose_name = 'Идея для свидания'
-        verbose_name_plural = 'Идеи для свиданий'
-        ordering = ['-created_at']
+class Meta:
+    verbose_name = 'Идея для свидания'
+    verbose_name_plural = 'Идеи для свиданий'
+    ordering = ['-created_at']
