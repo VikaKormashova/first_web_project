@@ -1,0 +1,29 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}Удаление идеи | DateIdeas{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="h4 mb-0">⚠️ Подтверждение удаления</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Вы уверены, что хотите удалить идею <strong>"{{ object.title }}"</strong>?</p>
+                    <p class="text-muted">Это действие нельзя отменить.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">✅ Да, удалить</button>
+                            <a href="{% url 'idea_detail' object.pk %}" class="btn btn-secondary">❌ Отмена</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
